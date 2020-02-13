@@ -1,0 +1,20 @@
+version: '2'
+
+services:
+  clock:
+    image: clock:latest
+    volumes:
+    - time_xchange:/mnt/time
+
+  timeserver:
+    image: timeserver:latest
+    volumes:
+    - time_xchange:/var/www/html
+
+  client:
+    image: client:latest
+
+
+volumes:
+  time_xchange:
+
