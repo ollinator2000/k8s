@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-dockerregistry
+spec: 
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi

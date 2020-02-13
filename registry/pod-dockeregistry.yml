@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-dockerregistry
+  labels:
+    app: dockerregistry
+spec:
+  containers:
+  - name: dockerregistry
+    image: registry:latest
+    ports:
+    - name: dockerreg-port 
+      containerPort: 5000
+      protocol: TCP
+    volumeMounts:
+      - mountPath: /var/lib/registry
+        name: registryvol    
+  volumes:
+  - name: registryvol
+    persistentVolumeClaim:
+      claimName: pvc-dockerregistry
