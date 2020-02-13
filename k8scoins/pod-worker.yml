@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-worker
+  labels:
+    app: coinsworker
+spec:
+  containers:
+  - name: worker
+    image: 10.111.230.82:5000/worker:latest

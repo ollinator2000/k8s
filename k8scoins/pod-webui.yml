@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-webui
+  labels:
+    app: coinswebui
+spec:
+  containers:
+  - name: webui
+    image: 10.111.230.82:5000/webui:latest
+    ports:
+    - name: webui-port 
+      containerPort: 80
+      protocol: TCP

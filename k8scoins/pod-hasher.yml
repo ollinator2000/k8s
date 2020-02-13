@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-hasher
+  labels:
+    app: coinshasher
+spec:
+  containers:
+  - name: hasher
+    image: 10.111.230.82:5000/hasher:latest
+    ports:
+    - name: hasher-port 
+      containerPort: 80
+      protocol: TCP
