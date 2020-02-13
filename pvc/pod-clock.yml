@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: podclock1
+spec:
+  containers:
+  - name: clockserver
+    image: alpine:latest
+    volumeMounts:
+      - mountPath: /mnt
+        name: timevol
+    command:
+    - /bin/sh
+    - -c    
+    args:
+      - while true ; do date > /mnt/time.txt; sleep 2 ; done       
+
+  volumes:
+  - name: timevol
+    persistentVolumeClaim:
+      claimName: pvc-clock
