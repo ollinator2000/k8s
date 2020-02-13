@@ -1,0 +1,356 @@
+
+# Backlog
+
+* Image-Aktualisierung
+
+
+
+https://pad.linuxhotel.de/p/Docker_20200210
+
+Debian Betriebssystem-Container bauen:
+    mkdir debian-buster
+    debootstrap buster debian-buster/ http://debs.debian.org/debian
+
+Chroot:
+    chroot debian-buster
+    ps ax
+
+systemd-nspawn:
+    systemd-nspawn -D debian-buster/
+    ps ax
+
+nextcloud Contaier mit Docker starten:
+    docker run -d -p 8080:80 nextcloud
+
+Alle Container Namespaces betreten:
+    pgrep -la apache
+    nsenter --target 4711 -
+
+Nur Netzwerk-Namespace betreten:
+    nsenter --target 4711 --net
+
+
+   apt-get remove --purge docker.io
+
+   apt-get install apt-transport-https ca-certificates curl software-properties-common
+   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+   add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+   apt-get install docker-ce docker-ce-cli
+
+
+
+
+   ps auxf | wc -l
+   ps auxf
+   ls /proc
+   apt-get update
+   apt-get install iproute2
+   ip link list
+   ip addr show
+   df -h
+   mount
+   lsblk
+   free -m
+   uname -a
+   hostname
+   cat /etc/hosts
+
+
+   75  docker info
+   76  docker run ubuntu
+   77  docker ps
+   78  docker ps -a
+
+   79  docker run -it ubuntu
+
+   82  docker start ab093e52f7d7
+   84  docker exec -ti ab093e52f7d7 /bin/bash
+
+   89  docker start ab093e52f7d7
+   90  docker ps -a
+   91  docker attach ab093e52f7d7
+
+   96  docker rm 77ed8a2aa67f
+
+   98  docker run -ti --rm ubuntu
+
+  101  docker top ab093e52f7d7
+  102  docker stats 
+
+  103  docker run --restart=always -ti ubuntu
+
+  107  docker run --restart=on-failure:2 -ti ubuntu
+
+
+
+
+docker run -d ubuntu /bin/bash -c "while true; do date; sleep 1; done"
+docker run -d --log-driver=journald ubuntu /bin/bash -c "while true; do date; sleep 1; done"
+
+docker inspect 697ae5fd8d83 | grep LogPath
+
+
+1. Container interaktiv starten
+2. Apache HTTPD installieren
+3. HTTPD starten
+4. IP-Adresse des Container rausfinden
+5. Startseite des Webserver im Browser aufrufen
+
+
+docker network create testnetz
+docker run --net testnetz -ti ubuntu
+
+1. Ein eigenes Netzwerk anlegen
+2. Drei Container starten (2x im eingenen Netz, 1x im Default-Netz)
+3. Prüfen, welche Container kommunizieren können (inetutils-ping)
+4. Nachvollziehen, welche Interfaces (inkl. Bridges) es im Host und in den Container gibt
+
+
+https://db0smg.de/cgi-bin/liesel3.jpg
+
+
+  142  docker network ls
+
+  149  docker network create --ipv6 --ip-range 2001:db8:0:f00::/96 --subnet 2001:db8:0:f00::/64 v6test 
+  150  docker network inspect v6test
+  151  docker run --rm -ti --network v6test
+  152  docker run --rm -ti --network v6test ubuntu 
+
+
+  154  docker volume create webcam
+  155  docker volume ls
+  156  docker volume inspect webcam
+  157  docker run -d -v webcam:/mnt ubuntu /bin/bash -c "while true; do curl https://db0smg.de/cgi-bin/liesel3.jpg > /mnt/webcam.jpg; sleep 5; done"
+  158  docker ps
+  159  docker run --rm -ti --volumes-from baa91df4c1cd ubuntu
+  160  docker logs ba
+  161  docker exec ba apt-get update 
+  165  docker exec ba apt-get install curl -y
+  166  docker logs ba -f
+
+
+https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-configuration-file
+
+https://docs.docker.com/engine/reference/builder/
+
+#########
+Gruppe 2
+##########
+Dockerfile:
+--------------------------------------
+FROM centos:latest
+RUN yum -y install httpd
+ENV FROM_Dockerfile=Wert1
+ARG FROM_extern=Wert2
+RUN echo $FROM_Dockerfile > /var/www/html/FROM_Dockerfile.txt
+RUN echo $FROM_extern > /var/www/html/FROM_Build.txt
+CMD /usr/sbin/httpd -D FOREGROUND
+
+Docker Build:
+------------------------------------------
+docker build --build-arg FROM_extern=Wert99 -f Dockerfile . -t gruppe2:latest
+
+Docker Start:
+--------------------------------------
+docker run gruppe2:latest
+
+
+#########
+Gruppe 3
+#########
+
+cat ./Dockerfile
+
+FROM centos:latest
+RUN yum -y install httpd
+ENTRYPOINT [ "htpasswd", "/htpasswd"]   
+CMD [ "default" ]
+
+
+touch /htpasswd-host
+
+docker run -it --rm -v /htpasswd-host/:/htpasswd gruppe3:latest
+docker run -it --rm -v /htpasswd-host:/htpasswd gruppe3:latest user1
+
+
+#########
+Gruppe 4
+#########
+
+#dockerfile
+#Test: ONBUILD, HEALTHCHECK
+
+FROM centos:latest
+
+RUN yum -y install httpd wget
+
+CMD /usr/sbin/httpd -D FOREGROUND
+
+ONBUILD RUN touch /tmp/used.txt
+
+HEALTHCHECK --interval=2s --timeout=2s \
+CMD wget http://localhost || exit 1
+
+
+#dockerfile ONBUILD
+FROM webserver:latest
+
+
+
+
+##########
+Gruppe 5
+##########
+
+Dockerfile - Gruppe 5
+
+------------------------------
+
+FROM debian:latest AS source_container
+RUN apt-get update
+RUN apt-get install -y cowsay
+RUN apt-get install -y fortune-mod
+RUN /usr/games/cowsay "$(/usr/games/fortune)"> /tmp/cowsay2_out.txt
+
+FROM centos:latest AS multistage
+RUN yum -y install httpd
+COPY --from=source_container /tmp/cowsay2_out.txt /var/www/html/cowsay_out.txt
+CMD /usr/sbin/httpd -DFOREGROUND
+
+--------------------------------
+
+#docker build -t multi .
+#docker run -d multi
+
+#docker build -t multi-new .
+#docker run -d multi-new
+
+Dateiname anpassen
+#docker build -t multi_nach_anpassung
+#docker run -d multi_nach_anpassung
+
+
+
+
+Gruppe1:
+    --------------------
+FROM centos:latest
+RUN yum -y install httpd
+
+FROM centos:latest
+RUN yum -y install httpd
+ADD gruppe1.xyz.tar /var/www/html
+CMD /usr/sbin/httpd -D FOREGROUND
+---------------------
+
+gruppe1# docker build -t gruppe1:latest .
+docker volume create dockertest2
+gruppe1# docker run -ti -v dockertest2:/var/www/html gruppe1:latest /bin/bash
+
+
+
+
+
+https://prometheus.io/docs/guides/cadvisor/
+
+# prom.yml 
+scrape_configs:
+- job_name: cadvisor
+  scrape_interval: 5s
+  static_configs:
+  - targets:
+    - 172.17.0.1:8080
+
+docker run -d -p 8080:8080 -v /:/rootfs:ro -v /var/run:/var/run:rw -v /sys:/sys:ro -v /var/lib/docker/:/var/lib/docker:ro   google/cadvisor:latest
+docker run -d -p 9090:9090 -v /root/prom.yml:/etc/prometheus/prometheus.yml:ro prom/prometheus:latest --config.file=/etc/prometheus/prometheus.yml
+
+
+
+
+root@notebook25:~/webtime# cat client/Dockerfile 
+FROM ubuntu:latest
+RUN apt-get update && apt-get install -y curl
+CMD while true; do curl -s http://timeserver/date.txt; sleep 1; done
+
+
+root@notebook25:~/webtime# cat clock/Dockerfile 
+FROM ubuntu:latest
+VOLUME /timevol
+CMD while true; do date > /timevol/date.txt; sleep 1; done
+
+  365  docker build -t clock:latest .
+  378  docker build -t client:latest .
+
+ docker volume create timevol
+ docker network create timenet
+
+ docker run -v timevol:/timevol -d clock:latest
+ docker run --rm -ti --volumes-from e465e9bf5dc3 ubuntu ls /timevol
+ docker run --net timenet --net-alias timeserver -v timevol:/usr/local/apache2/htdocs -d httpd
+ docker inspect 95 | grep 172
+ curl 172.19.0.2/date.txt
+ docker run --net timenet -d client:latest
+ docker logs e9 -f
+
+
+curl -L https://github.com/docker/compose/releases/download/1.25.4/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+
+
+docker-compose.yml 
+version: '2'
+
+services:
+  client:
+    image: client:latest
+  clock:
+    image: clock:latest
+  timeserver:
+    image: httpd:latest
+
+
+docker-compose up
+
+
+1. Welche Netze und Container es gibt
+2. Weshalb der Client den Server (nicht) findet
+
+git clone https://github.com/jpetazzo/container.training
+
+
+
+  332  docker network create dockercoins
+  333  docker service create --name redis --network dockercoins redis:latest 
+  334  docker network rm dockercoins
+  335  docker network create --driver=overlay dockercoins
+  336  docker service create --name redis --network dockercoins redis:latest 
+  337  docker service create --name hasher --network dockercoins --no-resolve-image dockercoins_hasher:latest
+  338  docker service create --name webui -p 8888:8000 --network dockercoins --no-resolve-image dockercoins_webui:latest
+  339  docker ps | grep webui
+  340  docker exec -ti webui.1.eg0bu57fa7h7ikmwob109vwii /bin/bash
+  341  cd webui/
+  342  ls
+  343  vi files/index.html 
+  344  docker build -t dockercoins_webui:2.0 .
+  345  docker service ls
+  346  docker service update webui --image=dockercoins_webui:2.0
+  347  docker service update
+  348  docker service update --help
+  349  docker service update webui --image=dockercoins_webui:2.0 --no-resolve-image
+  350  docker service ps webui
+  351  docker service update webui --rollback
+  352  docker service ps webui
+  353  docker service update webui --rollback --no-resolve-image
+  354  docker service update webui --rollback
+  355  docker service ps webui
+  356  cd ..
+  357  cd worker
+  358  docker service ls
+  359  docker service updagte worker --replicas=10
+  360  docker service update worker --replicas=10
+  361  vi worker.py 
+  362  docker build -t dockercoins_worker:2.0 .
+  363  docker service update worker --no-resolve-image --image=dockercoins_worker:2.0
+
+
+
