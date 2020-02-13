@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-webui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: coinswebui
+      component: webui
+  template:
+    metadata:
+      labels:
+        app: coinswebui
+        component: webui
+    spec:
+      containers:
+      - name: webui
+        image: 10.111.230.82:5000/webui:latest
+        ports:
+        - name: webui-port 
+          containerPort: 80
+          protocol: TCP

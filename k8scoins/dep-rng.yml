@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-rng
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: coinsrng
+      component: rng
+  template:
+    metadata:
+      labels:
+        app: coinsrng
+        component: rng
+    spec:
+      containers:
+      - name: rng
+        image: 10.111.230.82:5000/rng:latest
+        ports:
+        - name: rng-port 
+          containerPort: 80
+          protocol: TCP

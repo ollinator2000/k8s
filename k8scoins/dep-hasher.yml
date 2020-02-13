@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-hasher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: coinshasher
+      component: hasher
+  template:
+    metadata:
+      labels:
+        app: coinshasher
+        component: hasher
+    spec: 
+      containers:
+      - name: hasher
+        image: 10.111.230.82:5000/hasher:latest
+        ports:
+        - name: hasher-port 
+          containerPort: 80
+          protocol: TCP

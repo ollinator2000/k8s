@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: coinsworker
+      component: worker
+  template:
+    metadata:
+      labels:
+        app: coinsworker
+        component: worker
+    spec:
+      containers:
+      - name: worker
+        image: 10.111.230.82:5000/worker:latest
