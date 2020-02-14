@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata: 
+  name: resourcequota-training
+spec:
+  hard:
+    requests.cpu: "1"
+    requests.memory: 1Gi
+    limits.cpu: "2"
+    limits.memory: 2Gi
+    count/pods: "4"
+    count/persistentvolumeclaims: "2"
+    count/services: "2"
+    count/services.nodeports: "1"

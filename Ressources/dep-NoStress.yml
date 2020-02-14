@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dep-nostress
+spec:
+  selector:
+    matchLabels:
+      app: nostress
+  replicas: 1
+  template:
+    metadata: 
+      labels:
+        app: nostress
+    spec:
+      containers:
+        - name: nostress
+          image: alpine
+          stdin: true
+          tty: true
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "500m"
+            limits:
+              memory: "256Mi"
+              cpu: "1"
