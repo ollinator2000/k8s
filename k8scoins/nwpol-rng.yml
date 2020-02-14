@@ -1,0 +1,21 @@
+      
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: nwpol-rng
+spec:
+  podSelector:
+    matchLabels:
+      app: coinsrng
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: coinsworker
+  - ports:
+    - port: 80
+      protocol: TCP
+

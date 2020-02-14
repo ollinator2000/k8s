@@ -1,0 +1,24 @@
+      
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: nwpol-redis
+spec:
+  podSelector:
+    matchLabels:
+      app: coinsredis
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - coinswebui
+          - coinsworker
+    ports:
+    - port: 6379  
+      protocol: TCP
