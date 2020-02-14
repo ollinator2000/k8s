@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-stress
+spec:
+  containers:
+  - name: stress
+    image: alpine
+    stdin: true
+    tty: true
+  

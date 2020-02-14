@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-nostress
+spec:
+  containers:
+  - name: nostress
+    image: alpine
+    stdin: true
+    tty: true
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "500m"
+      limits:
+        memory: "256Mi"
+        cpu: "1"
